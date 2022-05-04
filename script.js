@@ -107,17 +107,44 @@ function checkShipPosition(left, top) {
                         difference = true;
                     }
                 }
-
             }
         }
     }
-    
     if (difference) {
         shipActive.classList.add('ship-red');
     } else {
         shipActive.classList.remove('ship-red');
     }
-    setShipPosition(left, top); 
+    setShipPosition(left, top);
+    //проверка на актуальность красного эффекта
+    checkRelevancePosition(); 
+}
+
+function checkRelevancePosition() {
+    let leftA, topA, rightA, bottomA;
+    let leftB, topB, rightB, bottomB;
+    let difference;
+    for (const shipA of ships) {
+        difference = false;
+        leftA = shipA.ship.offsetLeft;
+        topA = shipA.ship.offsetTop;
+        rightA = Number(leftA) + Number(getComputedStyle(shipA.ship).width.replace('px', '')) - 50;
+        bottomA = Number(topA) + Number(getComputedStyle(shipA.ship).width.replace('px', '')) - 50;
+        for (const shipB of ships) {
+            if (shipB.ship != shipA.ship) {
+                leftB = shipB.ship.offsetLeft;
+                topB = shipB.ship.offsetTop;
+                rightB = Number(leftB) + Number(getComputedStyle(shipB.ship).width.replace('px', '')) - 50;
+                bottomB = Number(topB) + Number(getComputedStyle(shipB.ship).width.replace('px', '')) - 50;
+                //проверка
+            }
+        }
+        if (difference) {
+            shipActive.classList.add('ship-red');
+        } else {
+            shipActive.classList.remove('ship-red');
+        }
+    }
 }
 
 function setShipPosition(left, top) {
@@ -125,7 +152,7 @@ function setShipPosition(left, top) {
     shipActive.style.top = top + 'px';
 }
 
-function moveShip(classTag, left) {
+function addShip(classTag, left) {
     let ship = createElement(player1, 'div', ['ship', classTag]);
     ship.style.top = '40%';
     ship.style.left = left;
@@ -140,9 +167,11 @@ function moveShip(classTag, left) {
     blockButtons();
     ship.addEventListener('click', function(){
         if (ship != shipActive) {
-            blockButtons();
-            shipActive = ship;
-            ship.classList.add('active-ship');
+            if (shipActive == null) {
+                blockButtons();
+                shipActive = ship;
+                ship.classList.add('active-ship');
+            }
         } else {
             blockButtons();
             shipActive = null;
@@ -176,22 +205,22 @@ function init() { /* это запуск всех ф-ций */
     generateBox(player2);
 
     fourButton.addEventListener('click', function(){
-        moveShip('four', '30%');
+        addShip('four', '30%');
         addElements(fourButton);
     }); /* "слушаем" событие  - клик, ф-ция при выполнении события*/
     
     threeButton.addEventListener('click', function(){
-        moveShip('three', '30%');
+        addShip('three', '30%');
         addElements(threeButton);
     }); /* таким образом ф-ция создается только при нажатии на кнопку, а после выполнения удаляется */
     
     twoButton.addEventListener('click', function(){
-        moveShip('two', '40%');
+        addShip('two', '40%');
         addElements(twoButton);
     });
     
     oneButton.addEventListener('click', function(){
-        moveShip('one', '40%');
+        addShip('one', '40%');
         addElements(oneButton);
     }); 
 
