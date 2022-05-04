@@ -1,0 +1,106 @@
+@import url('https://fonts.googleapis.com/css2?family=Source+Code+Pro:wght@400;500&display=swap');
+
+* {
+    box-sizing: border-box; /* считает рамки в размер элемента */
+    margin: 0;
+    padding: 0;
+    color: #063971;
+    font-family: 'Source Code Pro', monospace;
+    font-weight: 500;
+}
+
+.wrapper {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    padding-top: 50px; 
+    gap: 50px; /* отступы между блоками, которые находятся внутри враппера (у которого флекс:))))) */
+}
+
+.box-conteiner {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+}
+
+.button-conteiner {
+    display: flex;
+    gap: 50px;
+    width: 50%;
+    justify-content: center;
+}
+
+.box {
+    width: 500px;
+    height: 500px;
+    /* background-image: url(https://neposed.net/images/olga/igraya_razvivaemsya/nastolno-pechatnie_igri/morskoi-boi1/morskoi-boi2.png); /* это фоновая картинка с инета 
+    background-image: url(assets/img/box.png);
+    background-position: center;
+    background-size: 100%; */
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-start;
+    flex-direction: row;
+    flex-wrap: wrap;
+    border: 2px solid #063971;
+    box-sizing: content-box;
+    position: relative; /* тут он такой главный для .ship */
+}
+
+.cell {
+    border: 1px solid black;
+    width: 10%;
+    height: 10%;
+    position: relative;
+}
+
+.ship {
+    position: absolute; /* вне верстки (сверху) */
+    border: 1px solid black;
+    background-color: #063971;
+    width: 10%;
+    height: 10%;
+    opacity: 0.9;
+}
+
+.ship-red {
+    background-color: rgb(167, 30, 30);
+    opacity: 0.9;
+}
+
+.four {
+    width: 40%;
+}
+
+.three {
+    width: 30%;
+}
+
+.two {
+    width: 20%;
+}
+
+ .active-ship {
+    border: none;
+    opacity: 0.75;
+ }
+
+.button {
+    padding: 10px;
+    border-radius: 5px;
+    border: 2px solid #063971;
+    transition: 0.5s;
+}
+
+.button:hover {
+    transform: scale(1.1);
+}
+
+.button:active {
+    background-color: #063971;
+    color: white;
+}
+
+.button:disabled {
+    opacity: 0.25;
+}
