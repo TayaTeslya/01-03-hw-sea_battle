@@ -84,39 +84,31 @@ function checkShipPosition(left, top) {
             bottomShip = ship.ship.offsetTop + Number(getComputedStyle(ship.ship).height.replace('px', '')) - 50;
             leftShip = ship.ship.offsetLeft;
             topShip = ship.ship.offsetTop;
-            //если активный находится левее, то берем конец активного и начало неактивного, иначе - начало активного, конец неактивного
-            // if (left < leftShip) { //right и leftShip
-            //     if (leftShip - right <= 50) {
-            //         difference = true;
-            //     }
-            // } else {  //left и rightShip
-            //     if (left - rightShip <= 50) {
-            //         difference = true;
-            //     }
-            // }
-
             //если активный выше, берем конец активного и начало неактивного, иначе - начало активного и конец неактивного
-            // if (top < topShip) { //bottom и topShip
-            //     if (topShip - bottom <= 50) {
-            //         difference = true;
-            //     }
-            // } else { //top и bottomShip
-            //     if (top - bottomShip <= 50) {
-            //         difference = true;
-            //     }
-            // }
-            
-            
-            
-            
+            if (top < topShip) { //bottom и topShip
+                //если активный находится левее, то берем конец активного и начало неактивного, иначе - начало активного, конец неактивного
+                if (left < leftShip) { //right и leftShip
+                    if (leftShip - right <= 50 && topShip - bottom <= 50) {
+                        difference = true;
+                    }
+                } else {  //left и rightShip
+                    if (left - rightShip <= 50 && topShip - bottom <= 50) {
+                        difference = true;
+                    }
+                }
+            } else { //top и bottomShip
+                //если активный находится левее, то берем конец активного и начало неактивного, иначе - начало активного, конец неактивного
+                if (left < leftShip) { //right и leftShip
+                    if (leftShip - right <= 50 && top - bottomShip <= 50) {
+                        difference = true;
+                    }
+                } else {  //left и rightShip
+                    if (left - rightShip <= 50 && top - bottomShip <= 50) {
+                        difference = true;
+                    }
+                }
 
-            
-            // console.log('прав - лев актив ' + Math.abs(rightShip - left));
-            // console.log('лев - прав актив ' + Math.abs(ship.ship.offsetLeft - right));
-            // console.log('Лев актив ' + left);
-            // console.log('Прав актив ' + right);
-            // console.log('лев ' + ship.ship.offsetLeft);
-            // console.log('прав ' + rightShip);
+            }
         }
     }
     
