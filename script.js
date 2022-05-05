@@ -41,15 +41,13 @@ let buttons = {
     one
 }
 
-function createElement(box, tag, classTags) { //ф-ция создания элемента
-    let element = document.createElement(tag); //создали элемент 
-    for (let i = 0; i < classTags.length; i++)  
-        element.classList.add(classTags[i]); //даем класс элементу
-    box.appendChild(element); //пихаем в поле
-    return element;
-}
-
-function generateBox(player) { //генерируем поле
+/**
+ * 
+ * @param {HTMLElement} player - поле с ячейками для определенного игрока
+ * - Генерирует поле с ячейками
+ * - Клик по ячейке для установки корабля
+ */
+function generateBox(player) { 
     let cell;
     for (let i = 0; i < 100 ; i++) {
         cell = createElement(player, 'div', ['cell']);
@@ -64,6 +62,59 @@ function generateBox(player) { //генерируем поле
     }
 }
 
+
+function createElement(box, tag, classTags) { //ф-ция создания элемента
+    let element = document.createElement(tag); //создали элемент 
+    for (let i = 0; i < classTags.length; i++)  
+        element.classList.add(classTags[i]); //даем класс элементу
+    box.appendChild(element); //пихаем в поле
+    return element;
+}
+
+
+function addShip(classTag, left) {
+    let ship = createElement(player1, 'div', ['ship', classTag]);
+    ship.style.top = '40%';
+    ship.style.left = left;
+    ships.push({
+        lengthShip: classTag,
+        directionShip: 'horizontal',
+        ship, //ship: ship
+        btn: buttons[classTag]
+    });
+    shipActive = ship;
+    ship.classList.add('active-ship');
+    blockButtons();
+    ship.addEventListener('click', function(){
+        if (ship != shipActive) {
+            if (shipActive == null) {
+                blockButtons();
+                shipActive = ship;
+                ship.classList.add('active-ship');
+            }
+        } else {
+            blockButtons();
+            shipActive = null;
+            ship.classList.remove('active-ship');
+        }
+    })
+}
+
+function addElements(clickButton) {
+    for (const btn in buttons) {
+        if (buttons[btn].button == clickButton) {
+            buttons[btn].elements++;
+        }
+    }
+}
+
+
+function setShipPosition(left, top) {
+    shipActive.style.left = left + 'px';
+    shipActive.style.top = top + 'px';
+}
+
+
 function checkShipPosition(left, top) {
     if (500 - left < getComputedStyle(shipActive).width.replace('px', '')) {
         left = 500 - getComputedStyle(shipActive).width.replace('px', '');
@@ -75,6 +126,7 @@ function checkShipPosition(left, top) {
     //проверка на актуальность красного эффекта
     checkShipCross(); 
 }
+
 
 function checkShipCross() {
     let leftA, topA, rightA, bottomA;
@@ -126,38 +178,6 @@ function checkShipCross() {
     }
 }
 
-function setShipPosition(left, top) {
-    shipActive.style.left = left + 'px';
-    shipActive.style.top = top + 'px';
-}
-
-function addShip(classTag, left) {
-    let ship = createElement(player1, 'div', ['ship', classTag]);
-    ship.style.top = '40%';
-    ship.style.left = left;
-    ships.push({
-        lengthShip: classTag,
-        directionShip: 'horizontal',
-        ship, //ship: ship
-        btn: buttons[classTag]
-    });
-    shipActive = ship;
-    ship.classList.add('active-ship');
-    blockButtons();
-    ship.addEventListener('click', function(){
-        if (ship != shipActive) {
-            if (shipActive == null) {
-                blockButtons();
-                shipActive = ship;
-                ship.classList.add('active-ship');
-            }
-        } else {
-            blockButtons();
-            shipActive = null;
-            ship.classList.remove('active-ship');
-        }
-    })
-}
 
 function blockButtons() {
     let count = 0;
@@ -178,13 +198,7 @@ function blockButtons() {
     deleteButton.disabled = !deleteButton.disabled;
 }
 
-function addElements(clickButton) {
-    for (const btn in buttons) {
-        if (buttons[btn].button == clickButton) {
-            buttons[btn].elements++;
-        }
-    }
-}
+
 
 function init() { /* это запуск всех ф-ций */
 
