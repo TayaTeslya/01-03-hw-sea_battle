@@ -9,6 +9,8 @@ const turnButton = document.getElementById('turn-button');
 const readyButton = document.getElementById('ready-button');
 let shipActive;
 let ships = [];
+let shipsPlayer1 = [];
+let shipsPlayer2 = [];
 
 let four = {
     button: fourButton,
@@ -42,7 +44,6 @@ let buttons = {
 }
 
 /**
- * 
  * @param {HTMLElement} player - поле с ячейками для определенного игрока
  * - Генерирует поле с ячейками
  * - Клик по ячейке для установки корабля
@@ -62,30 +63,47 @@ function generateBox(player) {
     }
 }
 
-
-function createElement(box, tag, classTags) { //ф-ция создания элемента
-    let element = document.createElement(tag); //создали элемент 
+/**
+ * @param {HTMLElement} box - поле, в котором мы создаем элемент (корабль)
+ * @param {String} tag - тэг html-элемента
+ * @param {String} classTags - класс html-элемента
+ * @returns {HTMLelement} - возвращает добавленный html-элемент
+ * 1) Создает элемент (корабль)
+ * 2) Дает элементу классы (класс ship и four/tree/two/one)
+ * 3) Добавляет созданный элемент в поле
+ */
+function createElement(box, tag, classTags) {
+    let element = document.createElement(tag); // 1
     for (let i = 0; i < classTags.length; i++)  
-        element.classList.add(classTags[i]); //даем класс элементу
-    box.appendChild(element); //пихаем в поле
+        element.classList.add(classTags[i]); // 2
+    box.appendChild(element); // 3
     return element;
 }
 
-
+/**
+ * @param {String} classTag - класс размера корабля
+ * @param {String} left - для позиционирования корабля
+ * 1) Добавляет корабль
+ * 2) Задает стартовые координаты
+ * 3) Добавляет корабль в массив кораблей
+ * 4) Делает корабль активным для размещения
+ * 5) Блокирует кнопки добавления нового корабля пока не поставим
+ * 6) Событие при клике на корабль - делает его активным, если никакой не был активным
+ */
 function addShip(classTag, left) {
-    let ship = createElement(player1, 'div', ['ship', classTag]);
-    ship.style.top = '40%';
+    let ship = createElement(player1, 'div', ['ship', classTag]); // 1
+    ship.style.top = '40%'; // 2
     ship.style.left = left;
-    ships.push({
+    ships.push({ // 3
         lengthShip: classTag,
         directionShip: 'horizontal',
         ship, //ship: ship
         btn: buttons[classTag]
     });
-    shipActive = ship;
+    shipActive = ship; // 4
     ship.classList.add('active-ship');
-    blockButtons();
-    ship.addEventListener('click', function(){
+    blockButtons(); // 5
+    ship.addEventListener('click', function(){ // 6
         if (ship != shipActive) {
             if (shipActive == null) {
                 blockButtons();
@@ -100,7 +118,11 @@ function addShip(classTag, left) {
     })
 }
 
-function addElements(clickButton) {
+/**
+ * @param {HTMLElement} clickButton - кнопка добавления корабля
+ * Добавляет объекту four/three/two/one в объекте buttons +1 к кол-ву поставленных кораблей
+ */
+function incElements(clickButton) {
     for (const btn in buttons) {
         if (buttons[btn].button == clickButton) {
             buttons[btn].elements++;
@@ -108,31 +130,44 @@ function addElements(clickButton) {
     }
 }
 
-
+/**
+ * @param {number} left - позиция относительно левого края
+ * @param {number} top - позиция относительно верхнего края
+ * Ставит корабль на выбранную позицию
+ */
 function setShipPosition(left, top) {
     shipActive.style.left = left + 'px';
     shipActive.style.top = top + 'px';
 }
 
-
+/**
+ * @param {number | string} left - позиция относительно левого края
+ * @param {number | string} top - позиция относительно верхнего края
+ * 1) Проверка на выход за границы поля - двигает при выходе за границы 
+ * 2) Ставит на координаты
+ * 3) Проверяет наличие пересечений
+ */
 function checkShipPosition(left, top) {
-    if (500 - left < getComputedStyle(shipActive).width.replace('px', '')) {
+    if (500 - left < getComputedStyle(shipActive).width.replace('px', '')) { // 1
         left = 500 - getComputedStyle(shipActive).width.replace('px', '');
     }
     if (500 - top < getComputedStyle(shipActive).height.replace('px', '')) {
         top = 500 - getComputedStyle(shipActive).height.replace('px', '');
     }
-    setShipPosition(left, top);
-    //проверка на актуальность красного эффекта
-    checkShipCross(); 
+    setShipPosition(left, top); // 2
+    checkShipCross(); // 3
 }
 
-
+/**
+ * 1) Поочередно берет координаты каждого корабля и сравнивает с координатами остальных кораблей
+ * 2) Делает пересекающиеся корабли красными - дает класс red-ship
+ * 3) Делает непересекающиеся корабли обычными - убирает класс red-ship
+ */
 function checkShipCross() {
     let leftA, topA, rightA, bottomA;
     let leftB, topB, rightB, bottomB;
     let difference;
-    for (const shipA of ships) {
+    for (const shipA of ships) { // 1
         difference = false;
         leftA = shipA.ship.offsetLeft;
         topA = shipA.ship.offsetTop;
@@ -144,25 +179,25 @@ function checkShipCross() {
                 topB = shipB.ship.offsetTop;
                 rightB = Number(leftB) + Number(getComputedStyle(shipB.ship).width.replace('px', '')) - 50;
                 bottomB = Number(topB) + Number(getComputedStyle(shipB.ship).height.replace('px', '')) - 50;
-                //проверка
+                //если активный находится выше, берем конец активного и начало неактивного, иначе - начало активного и конец неактивного
                 if (topA < topB) { //bottomA и topB
-                    //если активный находится левее, то берем конец активного и начало неактивного, иначе - начало активного, конец неактивного
-                    if (leftA < leftB) { //right и leftShip
+                    //если активный находится левее, берем конец активного и начало неактивного, иначе - начало активного, конец неактивного
+                    if (leftA < leftB) { //rightA и leftB
                         if (leftB - rightA <= 50 && topB - bottomA <= 50) {
                             difference = true;
                         }
-                    } else {  //left и rightShip
+                    } else {  //leftA и rightB
                         if (leftA - rightB <= 50 && topB - bottomA <= 50) {
                             difference = true;
                         }
                     }
-                } else { //top и bottomShip
-                    //если активный находится левее, то берем конец активного и начало неактивного, иначе - начало активного, конец неактивного
-                    if (leftA < leftB) { //right и leftShip
+                } else { //topA и bottomB
+                    //если активный находится левее, берем конец активного и начало неактивного, иначе - начало активного, конец неактивного
+                    if (leftA < leftB) { //rightA и leftB
                         if (leftB - rightA <= 50 && topA - bottomB <= 50) {
                             difference = true;
                         }
-                    } else {  //left и rightShip
+                    } else {  //leftA и rightB
                         if (leftA - rightB <= 50 && topA - bottomB <= 50) {
                             difference = true;
                         }
@@ -171,21 +206,25 @@ function checkShipCross() {
             }
         }
         if (difference) {
-            shipA.ship.classList.add('ship-red');
+            shipA.ship.classList.add('ship-red'); // 2
         } else {
-            shipA.ship.classList.remove('ship-red');
+            shipA.ship.classList.remove('ship-red'); // 3
         }
     }
 }
 
-
+/**
+ * 1) Блокирует кнопки добавления кораблей, если их уже максимум или если активен какой-то корабль
+ * 2) Блокирует кнопку "Готово", если есть пересекающиесся корабли и/или не все корабли поставлены
+ * 3) Блокирует/разблокирует кнопки поворота и удаления корабля если какой-то корабль неактивен/активен соответственно
+ */
 function blockButtons() {
-    let count = 0;
+    let count = 0; // 1
     for (const btn in buttons) {
         buttons[btn].button.disabled = buttons[btn].elements == buttons[btn].max ? true : !buttons[btn].button.disabled;
         count += buttons[btn].elements;
     }
-    let redship = false;
+    let redship = false; // 2
     for (const ship of ships) {
         if (ship.ship.classList.contains('ship-red')) {
             redship = true;
@@ -194,69 +233,75 @@ function blockButtons() {
     if (!redship) {
         readyButton.disabled = count == 10 ? false : true;
     }
-    turnButton.disabled = !turnButton.disabled;
+    turnButton.disabled = !turnButton.disabled; // 3
     deleteButton.disabled = !deleteButton.disabled;
 }
 
-
-
-function init() { /* это запуск всех ф-ций */
+/**
+ * Инициализирующая ф-ция (ф-ция запуска программы)
+ */
+function init() {
 
     generateBox(player1);
     generateBox(player2);
 
-    fourButton.addEventListener('click', function(){
-        addShip('four', '30%');
-        addElements(fourButton);
-    }); /* "слушаем" событие  - клик, ф-ция при выполнении события*/
-    
-    threeButton.addEventListener('click', function(){
-        addShip('three', '30%');
-        addElements(threeButton);
-    }); /* таким образом ф-ция создается только при нажатии на кнопку, а после выполнения удаляется */
-    
-    twoButton.addEventListener('click', function(){
-        addShip('two', '40%');
-        addElements(twoButton);
+    fourButton.addEventListener('click', function() { //по клику на кнопку *четыре* добавляем четырехпалубный корабль
+        addShip('four', '30%'); //Добавляем корабль на поле с классом four и ставим ~на середину (30%)
+        incElements(fourButton); //Добавляем +1 к кол-ву четырехпалубных кораблей
     });
     
-    oneButton.addEventListener('click', function(){
+    threeButton.addEventListener('click', function() {
+        addShip('three', '30%');
+        incElements(threeButton);
+    });
+
+    twoButton.addEventListener('click', function() {
+        addShip('two', '40%');
+        incElements(twoButton);
+    });
+    
+    oneButton.addEventListener('click', function() {
         addShip('one', '40%');
-        addElements(oneButton);
+        incElements(oneButton);
     }); 
 
-    deleteButton.addEventListener('click', function(){
-        for (let i = 0; i < ships.length; i++) {
+    /**
+     * 1) Отнимаем от кол-ва кораблей 1 (от кол-ва кораблей размера выбранного корабля)
+     * 2) Удаляем объект корабля из массива кораблей
+     * 3) Удаляем корабль из html-документа
+     */
+    deleteButton.addEventListener('click', function() {
+        for (let i = 0; i < ships.length; i++) { // 1
             if (ships[i].ship == shipActive) {
                 for (const btn in buttons) {
                     if (buttons[btn].button == ships[i].btn.button) {
                             buttons[btn].elements--;
                         }
                     }
-                ships.splice(i, 1); //удаляем объект из массива кораблей
+                ships.splice(i, 1); // 2
                 break;
             }
         }
-        player1.removeChild(shipActive);
+        player1.removeChild(shipActive); // 3
         shipActive = null;
         blockButtons();
     });
     
+    /**
+     * 1) Меняем местами высоту и ширину ("поворачиваем" корабль)
+     * 2) Если корабль выходит за границу, двигаем его
+     */
     turnButton.addEventListener('click', function(){
-        let wh = getComputedStyle(shipActive).width;
+        let wh = getComputedStyle(shipActive).width; // 1
         shipActive.style.width = getComputedStyle(shipActive).height;
         shipActive.style.height = wh;
         shipActive.classList.remove('active-ship');
-        checkShipPosition(shipActive.style.left.replace('px', ''), shipActive.style.top.replace('px', ''));
-        for (let i = 0; i < ships.length; i++) {
-            if (ships[i].ship == shipActive) {
-                ships[i].directionShip = (ships[i].directionShip == 'horizontal') ? 'vertical' : 'horizontal'; 
-                break;
-            }
-        }
+        checkShipPosition(shipActive.style.left.replace('px', ''), shipActive.style.top.replace('px', '')); // 2
         blockButtons();
         shipActive = null;
     });
+
+    
 
 }
 
