@@ -117,7 +117,7 @@ function checkShipPosition(left, top) {
     }
     setShipPosition(left, top);
     //проверка на актуальность красного эффекта
-    checkRelevancePosition(); 
+    //checkRelevancePosition(); 
 }
 
 function checkRelevancePosition() {
@@ -137,12 +137,35 @@ function checkRelevancePosition() {
                 rightB = Number(leftB) + Number(getComputedStyle(shipB.ship).width.replace('px', '')) - 50;
                 bottomB = Number(topB) + Number(getComputedStyle(shipB.ship).width.replace('px', '')) - 50;
                 //проверка
+                if (topA < topB) { //bottom и topShip
+                    //если активный находится левее, то берем конец активного и начало неактивного, иначе - начало активного, конец неактивного
+                    if (leftA < leftB) { //right и leftShip
+                        if (leftB - rightA <= 50 && topB - bottomA <= 50) {
+                            difference = true;
+                        }
+                    } else {  //left и rightShip
+                        if (leftA - rightB <= 50 && topB - bottomA <= 50) {
+                            difference = true;
+                        }
+                    }
+                } else { //top и bottomShip
+                    //если активный находится левее, то берем конец активного и начало неактивного, иначе - начало активного, конец неактивного
+                    if (leftA < leftB) { //right и leftShip
+                        if (leftB - rightA <= 50 && topA - bottomB <= 50) {
+                            difference = true;
+                        }
+                    } else {  //left и rightShip
+                        if (leftA - rightB <= 50 && topA - bottomB <= 50) {
+                            difference = true;
+                        }
+                    }
+                }
             }
         }
         if (difference) {
-            shipActive.classList.add('ship-red');
+            shipA.classList.add('ship-red');
         } else {
-            shipActive.classList.remove('ship-red');
+            shipA.classList.remove('ship-red');
         }
     }
 }
