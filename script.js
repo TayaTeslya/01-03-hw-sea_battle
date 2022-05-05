@@ -71,56 +71,12 @@ function checkShipPosition(left, top) {
     if (500 - top < getComputedStyle(shipActive).height.replace('px', '')) {
         top = 500 - getComputedStyle(shipActive).height.replace('px', '');
     }
-    let right = Number(left) + Number(getComputedStyle(shipActive).width.replace('px', '')) - 50;
-    let bottom = Number(top) + Number(getComputedStyle(shipActive).height.replace('px', '')) - 50;
-    let rightShip;
-    let bottomShip;
-    let difference = false;
-    let leftShip;
-    let topShip;
-    for (const ship of ships) { //красная, если расставлен близко к другому
-        if (ship.ship != shipActive) {
-            rightShip = ship.ship.offsetLeft + Number(getComputedStyle(ship.ship).width.replace('px', '')) - 50;
-            bottomShip = ship.ship.offsetTop + Number(getComputedStyle(ship.ship).height.replace('px', '')) - 50;
-            leftShip = ship.ship.offsetLeft;
-            topShip = ship.ship.offsetTop;
-            //если активный выше, берем конец активного и начало неактивного, иначе - начало активного и конец неактивного
-            if (top < topShip) { //bottom и topShip
-                //если активный находится левее, то берем конец активного и начало неактивного, иначе - начало активного, конец неактивного
-                if (left < leftShip) { //right и leftShip
-                    if (leftShip - right <= 50 && topShip - bottom <= 50) {
-                        difference = true;
-                    }
-                } else {  //left и rightShip
-                    if (left - rightShip <= 50 && topShip - bottom <= 50) {
-                        difference = true;
-                    }
-                }
-            } else { //top и bottomShip
-                //если активный находится левее, то берем конец активного и начало неактивного, иначе - начало активного, конец неактивного
-                if (left < leftShip) { //right и leftShip
-                    if (leftShip - right <= 50 && top - bottomShip <= 50) {
-                        difference = true;
-                    }
-                } else {  //left и rightShip
-                    if (left - rightShip <= 50 && top - bottomShip <= 50) {
-                        difference = true;
-                    }
-                }
-            }
-        }
-    }
-    if (difference) {
-        shipActive.classList.add('ship-red');
-    } else {
-        shipActive.classList.remove('ship-red');
-    }
     setShipPosition(left, top);
     //проверка на актуальность красного эффекта
-    //checkRelevancePosition(); 
+    checkShipCross(); 
 }
 
-function checkRelevancePosition() {
+function checkShipCross() {
     let leftA, topA, rightA, bottomA;
     let leftB, topB, rightB, bottomB;
     let difference;
@@ -129,15 +85,15 @@ function checkRelevancePosition() {
         leftA = shipA.ship.offsetLeft;
         topA = shipA.ship.offsetTop;
         rightA = Number(leftA) + Number(getComputedStyle(shipA.ship).width.replace('px', '')) - 50;
-        bottomA = Number(topA) + Number(getComputedStyle(shipA.ship).width.replace('px', '')) - 50;
+        bottomA = Number(topA) + Number(getComputedStyle(shipA.ship).height.replace('px', '')) - 50;
         for (const shipB of ships) {
             if (shipB.ship != shipA.ship) {
                 leftB = shipB.ship.offsetLeft;
                 topB = shipB.ship.offsetTop;
                 rightB = Number(leftB) + Number(getComputedStyle(shipB.ship).width.replace('px', '')) - 50;
-                bottomB = Number(topB) + Number(getComputedStyle(shipB.ship).width.replace('px', '')) - 50;
+                bottomB = Number(topB) + Number(getComputedStyle(shipB.ship).height.replace('px', '')) - 50;
                 //проверка
-                if (topA < topB) { //bottom и topShip
+                if (topA < topB) { //bottomA и topB
                     //если активный находится левее, то берем конец активного и начало неактивного, иначе - начало активного, конец неактивного
                     if (leftA < leftB) { //right и leftShip
                         if (leftB - rightA <= 50 && topB - bottomA <= 50) {
@@ -163,9 +119,9 @@ function checkRelevancePosition() {
             }
         }
         if (difference) {
-            shipA.classList.add('ship-red');
+            shipA.ship.classList.add('ship-red');
         } else {
-            shipA.classList.remove('ship-red');
+            shipA.ship.classList.remove('ship-red');
         }
     }
 }
@@ -209,7 +165,15 @@ function blockButtons() {
         buttons[btn].button.disabled = buttons[btn].elements == buttons[btn].max ? true : !buttons[btn].button.disabled;
         count += buttons[btn].elements;
     }
-    readyButton.disabled = count == 10 ? false : true;
+    let redship = false;
+    for (const ship of ships) {
+        if (ship.ship.classList.contains('ship-red')) {
+            redship = true;
+        }
+    }
+    if (!redship) {
+        readyButton.disabled = count == 10 ? false : true;
+    }
     turnButton.disabled = !turnButton.disabled;
     deleteButton.disabled = !deleteButton.disabled;
 }
@@ -260,6 +224,7 @@ function init() { /* это запуск всех ф-ций */
             }
         }
         player1.removeChild(shipActive);
+        shipActive = null;
         blockButtons();
     });
     
