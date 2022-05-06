@@ -10,6 +10,7 @@ const readyButton = document.getElementById('ready-button');
 const boxConteiner = document.getElementsByClassName('box-conteiner')[0];
 const player1Cover = document.getElementById('player1-cover');
 const player2Cover = document.getElementById('player2-cover');
+const readyPlayerButton = document.getElementById('button-ready-player');
 let shipActive;
 let ships = [];
 let shipsPlayer1 = [];
@@ -316,9 +317,6 @@ function init() {
                 box = player2;
                 player1Cover.style.display = 'flex';
                 generateBox(player1Cover);
-            } else {
-                box = player1;
-                generateBox(player2Cover);
             }
             boxConteiner.classList.add('box-reverse');
             // shipsPlayer1 = ships;
@@ -332,6 +330,10 @@ function init() {
                 buttons[button].button.disabled = false;
             }
         } else {
+            box = player1;
+            generateBox(player2Cover);
+            player2Cover.style.display = 'flex';
+            boxConteiner.classList.remove('box-reverse');
             //скрыть все поля (замазать?)
             //вспывающее окно с вопросом ("Игрок 1 готов к игре?")
             for (const button in buttons) {
@@ -341,9 +343,19 @@ function init() {
             deleteButton.classList.add('visibility');
             readyButton.disabled = true;
             readyButton.classList.add('visibility');
+            modalWindow(player1Cover);
         }
     })
 
+    
+}
+
+function modalWindow(box) {
+    document.getElementsByClassName('modal-conteiner')[0].style.display = 'flex';
+    readyPlayerButton.addEventListener('click', ()=>{
+        document.getElementsByClassName('modal-conteiner')[0].style.display = 'none';
+        box.style.display = 'none';
+    })
 }
 
 init();

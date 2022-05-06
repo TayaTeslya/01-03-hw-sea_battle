@@ -146,4 +146,36 @@
     display: none;
 }
 
+.modal-conteiner {
+    position: absolute;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.669);
+    z-index: 500;
+    padding: 220px;
+    display: none;
+}
+
+.modal-window {
+    position: absolute;
+    width: 500px;
+    height: 200px;
+    background-color: rgb(255, 255, 255);
+    border: 2px solid black;
+    border-radius: 30px;
+    z-index: 1000;
+    text-align: center;
+    font-size: 30px;
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
+}
+
+.modal-window button {
+    background-color: white;
+    width: 125px;
+}
 
