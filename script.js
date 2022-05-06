@@ -7,10 +7,14 @@ const oneButton = document.getElementById('one-button');
 const deleteButton = document.getElementById('delete-button');
 const turnButton = document.getElementById('turn-button');
 const readyButton = document.getElementById('ready-button');
+const boxConteiner = document.getElementsByClassName('box-conteiner')[0];
+const player1Cover = document.getElementById('player1-cover');
+const player2Cover = document.getElementById('player2-cover');
 let shipActive;
 let ships = [];
 let shipsPlayer1 = [];
 let shipsPlayer2 = [];
+let box = player1;
 
 let four = {
     button: fourButton,
@@ -91,7 +95,7 @@ function createElement(box, tag, classTags) {
  * 6) Событие при клике на корабль - делает его активным, если никакой не был активным
  */
 function addShip(classTag, left) {
-    let ship = createElement(player1, 'div', ['ship', classTag]); // 1
+    let ship = createElement(box, 'div', ['ship', classTag]); // 1
     ship.style.top = '40%'; // 2
     ship.style.left = left;
     ships.push({ // 3
@@ -230,8 +234,9 @@ function blockButtons() {
             redship = true;
         }
     }
+    readyButton.disabled = false;
     if (!redship) {
-        readyButton.disabled = count == 10 ? false : true;
+        //readyButton.disabled = count == 10 ? false : true;
     }
     turnButton.disabled = !turnButton.disabled; // 3
     deleteButton.disabled = !deleteButton.disabled;
@@ -245,22 +250,22 @@ function init() {
     generateBox(player1);
     generateBox(player2);
 
-    fourButton.addEventListener('click', function() { //по клику на кнопку *четыре* добавляем четырехпалубный корабль
+    fourButton.addEventListener('click', ()=>{ //по клику на кнопку *четыре* добавляем четырехпалубный корабль
         addShip('four', '30%'); //Добавляем корабль на поле с классом four и ставим ~на середину (30%)
         incElements(fourButton); //Добавляем +1 к кол-ву четырехпалубных кораблей
     });
     
-    threeButton.addEventListener('click', function() {
+    threeButton.addEventListener('click', ()=>{
         addShip('three', '30%');
         incElements(threeButton);
     });
 
-    twoButton.addEventListener('click', function() {
+    twoButton.addEventListener('click', ()=>{
         addShip('two', '40%');
         incElements(twoButton);
     });
     
-    oneButton.addEventListener('click', function() {
+    oneButton.addEventListener('click', ()=>{
         addShip('one', '40%');
         incElements(oneButton);
     }); 
@@ -270,7 +275,7 @@ function init() {
      * 2) Удаляем объект корабля из массива кораблей
      * 3) Удаляем корабль из html-документа
      */
-    deleteButton.addEventListener('click', function() {
+    deleteButton.addEventListener('click', ()=>{
         for (let i = 0; i < ships.length; i++) { // 1
             if (ships[i].ship == shipActive) {
                 for (const btn in buttons) {
@@ -291,7 +296,7 @@ function init() {
      * 1) Меняем местами высоту и ширину ("поворачиваем" корабль)
      * 2) Если корабль выходит за границу, двигаем его
      */
-    turnButton.addEventListener('click', function(){
+    turnButton.addEventListener('click', ()=>{
         let wh = getComputedStyle(shipActive).width; // 1
         shipActive.style.width = getComputedStyle(shipActive).height;
         shipActive.style.height = wh;
@@ -301,7 +306,43 @@ function init() {
         shipActive = null;
     });
 
-    
+    /**
+     * 1) Меняем местами поля
+     * 2) Добавляем в shipsPlayer1 все из ships, ships обнуляем
+     */
+    readyButton.addEventListener('click', ()=>{
+        if (!boxConteiner.classList.contains('box-reverse')) {
+            if (box == player1) {
+                box = player2;
+                player1Cover.style.display = 'flex';
+                generateBox(player1Cover);
+            } else {
+                box = player1;
+                generateBox(player2Cover);
+            }
+            boxConteiner.classList.add('box-reverse');
+            // shipsPlayer1 = ships;
+            shipsPlayer1 = [...ships] 
+            /* возьмет все содержимое из ships и поместит в массив shipsPlayer1
+            такая вещь нужна в случае, если нужно скопировать массив и добавить в него еще элементы (через запятую в [])
+            также с объектами {...ships, newElement, newElement: f} */
+            ships = [];
+            for (const button in buttons) {
+                buttons[button].elements = 0;
+                buttons[button].button.disabled = false;
+            }
+        } else {
+            //скрыть все поля (замазать?)
+            //вспывающее окно с вопросом ("Игрок 1 готов к игре?")
+            for (const button in buttons) {
+                buttons[button].button.classList.add('visibility');
+            }
+            turnButton.classList.add('visibility');
+            deleteButton.classList.add('visibility');
+            readyButton.disabled = true;
+            readyButton.classList.add('visibility');
+        }
+    })
 
 }
 
