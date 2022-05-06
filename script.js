@@ -64,6 +64,10 @@ function generateBox(player) {
                 blockButtons();
                 shipActive = null;
             }
+            if (event.target.parentNode.id == 'player1-cover' || event.target.parentNode.id == 'player2-cover') {
+                console.log('kek');
+
+            }
         });
     }
 }
@@ -308,11 +312,14 @@ function init() {
     });
 
     /**
-     * 1) Меняем местами поля
+     * 1) Меняем местами поля и скрываем поле первого игрока
      * 2) Добавляем в shipsPlayer1 все из ships, ships обнуляем
+     * 3) Обнуляем кнопки
+     * 4) по второму нажатию скрываем оба поля и вызываем модальное окно
+     * 
      */
     readyButton.addEventListener('click', ()=>{
-        if (!boxConteiner.classList.contains('box-reverse')) {
+        if (!boxConteiner.classList.contains('box-reverse')) { // 1
             if (box == player1) {
                 box = player2;
                 player1Cover.style.display = 'flex';
@@ -320,22 +327,20 @@ function init() {
             }
             boxConteiner.classList.add('box-reverse');
             // shipsPlayer1 = ships;
-            shipsPlayer1 = [...ships] 
+            shipsPlayer1 = [...ships] // 2
             /* возьмет все содержимое из ships и поместит в массив shipsPlayer1
             такая вещь нужна в случае, если нужно скопировать массив и добавить в него еще элементы (через запятую в [])
             также с объектами {...ships, newElement, newElement: f} */
             ships = [];
-            for (const button in buttons) {
+            for (const button in buttons) { // 3
                 buttons[button].elements = 0;
                 buttons[button].button.disabled = false;
             }
-        } else {
+        } else { // 4
             box = player1;
             generateBox(player2Cover);
             player2Cover.style.display = 'flex';
             boxConteiner.classList.remove('box-reverse');
-            //скрыть все поля (замазать?)
-            //вспывающее окно с вопросом ("Игрок 1 готов к игре?")
             for (const button in buttons) {
                 buttons[button].button.classList.add('visibility');
             }
@@ -350,11 +355,21 @@ function init() {
     
 }
 
+/**
+ * 
+ * @param {HTMLElement} box - скрывающее поле
+ * 1) показывает модальное окно "Готов ли игрок?"
+ * 2) после нажатия "ДА! "убирает скрывающее поле с поля активного игрока 
+ */
 function modalWindow(box) {
-    document.getElementsByClassName('modal-conteiner')[0].style.display = 'flex';
-    readyPlayerButton.addEventListener('click', ()=>{
+    document.getElementById('modal-p').textContent = box == player1Cover ? 'Игрок 1 готов?' : 'Игрок 2 готов?';
+    document.getElementsByClassName('modal-conteiner')[0].style.display = 'flex'; // 1
+    readyPlayerButton.addEventListener('click', ()=>{ // 2
         document.getElementsByClassName('modal-conteiner')[0].style.display = 'none';
-        box.style.display = 'none';
+        box.childNodes.forEach((cell)=>{
+            cell.classList.add('cell-cross');
+            cell.style.background = 'none';
+        })
     })
 }
 

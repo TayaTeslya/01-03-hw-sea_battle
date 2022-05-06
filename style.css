@@ -179,3 +179,26 @@
     width: 125px;
 }
 
+
+.cell-cross {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.cell-cross::after,
+.cell-cross::before {
+    content: "";
+    position: absolute;
+    width: 48px;
+    height: 2px;
+    background-color: rgb(0, 0, 0);
+}
+
+.cell-cross::after {
+    transform: rotate(45deg);
+}
+
+.cell-cross::before {
+    transform: rotate(-45deg);
+}
