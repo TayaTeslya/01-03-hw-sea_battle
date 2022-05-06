@@ -228,23 +228,34 @@ function checkShipCross() {
  * 3) Блокирует/разблокирует кнопки поворота и удаления корабля если какой-то корабль неактивен/активен соответственно
  */
 function blockButtons() {
-    let count = 0; // 1
-    for (const btn in buttons) {
-        buttons[btn].button.disabled = buttons[btn].elements == buttons[btn].max ? true : !buttons[btn].button.disabled;
-        count += buttons[btn].elements;
-    }
-    let redship = false; // 2
-    for (const ship of ships) {
-        if (ship.ship.classList.contains('ship-red')) {
-            redship = true;
+    if (ships != null) {
+        let count = 0; // 1
+        for (const btn in buttons) {
+            buttons[btn].button.disabled = buttons[btn].elements == buttons[btn].max ? true : !buttons[btn].button.disabled;
+            count += buttons[btn].elements;
         }
+        let redship = false; // 2
+        for (const ship of ships) {
+            if (ship.ship.classList.contains('ship-red')) {
+                redship = true;
+            }
+        }
+        readyButton.disabled = false;
+        if (!redship) {
+            //readyButton.disabled = count == 10 ? false : true;
+        }
+        turnButton.disabled = !turnButton.disabled; // 3
+        deleteButton.disabled = !deleteButton.disabled;
+    } else {
+        for (const button in buttons) {
+            buttons[button].button.classList.add('visibility');
+            buttons[button].button.disabled = true;
+        }
+        turnButton.disabled = true;
+        turnButton.classList.add('visibility');
+        deleteButton.disabled = true;
+        deleteButton.classList.add('visibility');   
     }
-    readyButton.disabled = false;
-    if (!redship) {
-        //readyButton.disabled = count == 10 ? false : true;
-    }
-    turnButton.disabled = !turnButton.disabled; // 3
-    deleteButton.disabled = !deleteButton.disabled;
 }
 
 /**
@@ -338,14 +349,12 @@ function init() {
             }
         } else { // 4
             box = player1;
+            shipsPlayer2 = [...ships];
+            ships = null;
             generateBox(player2Cover);
             player2Cover.style.display = 'flex';
             boxConteiner.classList.remove('box-reverse');
-            for (const button in buttons) {
-                buttons[button].button.classList.add('visibility');
-            }
-            turnButton.classList.add('visibility');
-            deleteButton.classList.add('visibility');
+            blockButtons();
             readyButton.disabled = true;
             readyButton.classList.add('visibility');
             modalWindow(player1Cover);
@@ -367,7 +376,6 @@ function modalWindow(box) {
     readyPlayerButton.addEventListener('click', ()=>{ // 2
         document.getElementsByClassName('modal-conteiner')[0].style.display = 'none';
         box.childNodes.forEach((cell)=>{
-            cell.classList.add('cell-cross');
             cell.style.background = 'none';
         })
     })
