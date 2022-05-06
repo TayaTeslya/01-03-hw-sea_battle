@@ -360,7 +360,6 @@ function init() {
             modalWindow(player1Cover);
         }
     })
-
     
 }
 
