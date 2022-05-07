@@ -16,6 +16,7 @@ let ships = [];
 let shipsPlayer1 = [];
 let shipsPlayer2 = [];
 let box = player1;
+let replay = false;
 
 let four = {
     button: fourButton,
@@ -65,8 +66,45 @@ function generateBox(player) {
                 shipActive = null;
             }
             if (event.target.parentNode.id == 'player1-cover' || event.target.parentNode.id == 'player2-cover') {
-                console.log('kek');
-
+                replay = false;
+                let left = event.target.offsetLeft;
+                let top = event.target.offsetTop;
+                let leftShip;
+                let topShip;
+                let shipsActive;
+                if (box == player1Cover) {
+                    shipsActive = shipsPlayer2;
+                } else {
+                    shipsActive = shipsPlayer1;
+                }
+                if (event.target.parentNode != box) {
+                    event.target.classList.add('cell-cross');
+                    for (const ship of shipsActive) {
+                        for (let i = 0; i < getComputedStyle(ship.ship).width.replace('px', '') / 50; i++) {
+                            leftShip = ship.ship.offsetLeft + 50 * i;
+                            for (let i = 0; i < getComputedStyle(ship.ship).height.replace('px', '') / 50; i++) {
+                                topShip = ship.ship.offsetTop  + 50 * i;
+                                if (left == leftShip && top == topShip) {
+                                    event.target.style.background = '#063971';
+                                    replay = true;
+                                }
+                            }
+                        }
+                    }
+                } else {
+                    return;
+                }
+                if (!replay) {
+                    player1Cover.style.background = 'white';
+                    player2Cover.style.background = 'white';
+                    if (box == player1Cover) {
+                        box = player2Cover;
+                        modalWindow(box);
+                    } else {
+                        box = player1Cover;
+                        modalWindow(box);
+                    }
+                }
             }
         });
     }
@@ -357,7 +395,8 @@ function init() {
             blockButtons();
             readyButton.disabled = true;
             readyButton.classList.add('visibility');
-            modalWindow(player1Cover);
+            box = player1Cover;
+            modalWindow(box);
         }
     })
     
@@ -370,14 +409,20 @@ function init() {
  * 2) после нажатия "ДА! "убирает скрывающее поле с поля активного игрока 
  */
 function modalWindow(box) {
+    if (box == player1Cover) {
+        boxConteiner.classList.remove('box-reverse');
+    } else {
+        boxConteiner.classList.add('box-reverse');
+    }
+    player1Cover.style.background = 'white';
+    player2Cover.style.background = 'white';
     document.getElementById('modal-p').textContent = box == player1Cover ? 'Игрок 1 готов?' : 'Игрок 2 готов?';
     document.getElementsByClassName('modal-conteiner')[0].style.display = 'flex'; // 1
     readyPlayerButton.addEventListener('click', ()=>{ // 2
         document.getElementsByClassName('modal-conteiner')[0].style.display = 'none';
-        box.childNodes.forEach((cell)=>{
-            cell.style.background = 'none';
-        })
+        box.style.background = 'none';
     })
+    //поменять поля местами
 }
 
 init();

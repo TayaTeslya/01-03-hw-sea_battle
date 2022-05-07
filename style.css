@@ -79,7 +79,7 @@
     width: 10%;
     height: 10%;
     position: relative;
-    background-color: white;
+    background-color: none;
 }
 
 .ship {
@@ -108,7 +108,7 @@
     width: 20%;
 }
 
- .active-ship {
+.active-ship {
     border: none;
     opacity: 0.75;
  }
@@ -144,6 +144,7 @@
 
 .box-cover {
     display: none;
+    background-color: white;
 }
 
 .modal-conteiner {
