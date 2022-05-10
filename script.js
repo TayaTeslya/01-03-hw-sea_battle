@@ -16,7 +16,7 @@ let ships = [];
 let shipsPlayer1 = [];
 let shipsPlayer2 = [];
 let box = player1;
-let replay = false;
+let completeSeparation = false;
 
 let four = {
     button: fourButton,
@@ -65,8 +65,7 @@ function generateBox(player) {
                 blockButtons();
                 shipActive = null;
             }
-            if (event.target.parentNode.id == 'player1-cover' || event.target.parentNode.id == 'player2-cover') {
-                replay = false;
+            if (completeSeparation) {
                 let left = event.target.offsetLeft;
                 let top = event.target.offsetTop;
                 let leftShip;
@@ -82,11 +81,20 @@ function generateBox(player) {
                     for (const ship of shipsActive) {
                         for (let i = 0; i < getComputedStyle(ship.ship).width.replace('px', '') / 50; i++) {
                             leftShip = ship.ship.offsetLeft + 50 * i;
-                            for (let i = 0; i < getComputedStyle(ship.ship).height.replace('px', '') / 50; i++) {
-                                topShip = ship.ship.offsetTop  + 50 * i;
+                            for (let j = 0; j < getComputedStyle(ship.ship).height.replace('px', '') / 50; j++) {
+                                topShip = ship.ship.offsetTop  + 50 * j;
                                 if (left == leftShip && top == topShip) {
                                     event.target.style.background = '#063971';
-                                    replay = true;
+                                    ship.quantityHits++;
+                                    if ((getComputedStyle(ship.ship).width.replace('px', '') / 50 == 1 
+                                        && ship.quantityHits == getComputedStyle(ship.ship).height.replace('px', '') / 50) 
+                                        || (getComputedStyle(ship.ship).height.replace('px', '') / 50 == 1 
+                                        && ship.quantityHits == getComputedStyle(ship.ship).width.replace('px', '') / 50)) {
+                                        
+                                        
+                                    }
+                                    
+                                    return;
                                 }
                             }
                         }
@@ -94,16 +102,14 @@ function generateBox(player) {
                 } else {
                     return;
                 }
-                if (!replay) {
-                    player1Cover.style.background = 'white';
-                    player2Cover.style.background = 'white';
-                    if (box == player1Cover) {
-                        box = player2Cover;
-                        modalWindow(box);
-                    } else {
-                        box = player1Cover;
-                        modalWindow(box);
-                    }
+                player1Cover.style.background = 'white';
+                player2Cover.style.background = 'white';
+                if (box == player1Cover) {
+                    box = player2Cover;
+                    modalWindow();
+                } else {
+                    box = player1Cover;
+                    modalWindow();
                 }
             }
         });
@@ -145,7 +151,8 @@ function addShip(classTag, left) {
         lengthShip: classTag,
         directionShip: 'horizontal',
         ship, //ship: ship
-        btn: buttons[classTag]
+        btn: buttons[classTag],
+        quantityHits: 0
     });
     shipActive = ship; // 4
     ship.classList.add('active-ship');
@@ -386,6 +393,7 @@ function init() {
                 buttons[button].button.disabled = false;
             }
         } else { // 4
+            completeSeparation = true;
             box = player1;
             shipsPlayer2 = [...ships];
             ships = null;
@@ -396,7 +404,7 @@ function init() {
             readyButton.disabled = true;
             readyButton.classList.add('visibility');
             box = player1Cover;
-            modalWindow(box);
+            modalWindow();
         }
     })
     
@@ -408,7 +416,7 @@ function init() {
  * 1) показывает модальное окно "Готов ли игрок?"
  * 2) после нажатия "ДА! "убирает скрывающее поле с поля активного игрока 
  */
-function modalWindow(box) {
+function modalWindow() {
     if (box == player1Cover) {
         boxConteiner.classList.remove('box-reverse');
     } else {
@@ -419,10 +427,8 @@ function modalWindow(box) {
     document.getElementById('modal-p').textContent = box == player1Cover ? 'Игрок 1 готов?' : 'Игрок 2 готов?';
     document.getElementsByClassName('modal-conteiner')[0].style.display = 'flex'; // 1
     readyPlayerButton.addEventListener('click', ()=>{ // 2
-        document.getElementsByClassName('modal-conteiner')[0].style.display = 'none';
-        box.style.background = 'none';
+        document.getElementsByClassName('modal-conteiner')[0].style.display = 'none';        box.style.background = 'none';
     })
-    //поменять поля местами
 }
 
 init();
