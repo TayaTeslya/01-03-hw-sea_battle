@@ -53,6 +53,10 @@ let buttons = {
  * @param {HTMLElement} player - поле с ячейками для определенного игрока
  * - Генерирует поле с ячейками
  * - Клик по ячейке для установки корабля
+ * При самой игре (completeSeparation):
+ * - При нажатии на клетку рисует крестик
+ * - Если там находится корабль, делает клетку синей
+ * - Если весь корабль найден, вызывает ф-цию топления корабля
  */
 function generateBox(player) { 
     let cell;
@@ -115,6 +119,11 @@ function generateBox(player) {
     }
 }
 
+/**
+ * @param {HTMLElement} field - поле с нужными клетками
+ * Считает кол-во красных клеток.
+ * Если их 20 (т.е. все корабли потоплены), вызывает модальное окно с концом игры
+ */
 function countRedShip(field) {
     let count = 0;
     for (const cell of field.children) {
@@ -127,6 +136,11 @@ function countRedShip(field) {
     }
 }
 
+/**
+ * Конец игры
+ * Модальное окно с надписью, какой игрок выйграл
+ * Кнопка "Сыграть еще раз"
+ */
 function endGame() {
     document.getElementById('modal-p').textContent = box == player1Cover ? 'Игрок 1 выйграл!' : 'Игрок 2 выйграл!';
     readyPlayerButton.textContent = 'Сыграть еще';
@@ -136,7 +150,12 @@ function endGame() {
     })
 }
 
-
+/**
+ * @param {HTMLElement} sink - утопленный корабль
+ * @param {HTMLElement} field - поле с нужными клетками
+ * 1) Делаем корабль красным
+ * 2) Вокруг корабля блокируем клетки крестиком
+ */
 function sinkShip(sink, field) {
     let leftShip = sink.offsetLeft;
     let topShip = sink.offsetTop;
@@ -425,7 +444,6 @@ function init() {
      * 2) Добавляем в shipsPlayer1 все из ships, ships обнуляем
      * 3) Обнуляем кнопки
      * 4) по второму нажатию скрываем оба поля и вызываем модальное окно
-     * 
      */
     readyButton.addEventListener('click', ()=>{
         if (!boxConteiner.classList.contains('box-reverse')) { // 1
@@ -466,8 +484,10 @@ function init() {
 /**
  * 
  * @param {HTMLElement} box - скрывающее поле
- * 1) показывает модальное окно "Готов ли игрок?"
- * 2) после нажатия "ДА! "убирает скрывающее поле с поля активного игрока 
+ * 1) Меняет местами поля
+ * 2) Скрывает их
+ * 3) показывает модальное окно "Готов ли игрок?"
+ * 4) после нажатия "ДА! "убирает скрывающее поле с поля активного игрока 
  */
 function modalWindow() {
     if (box == player1Cover) {
