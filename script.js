@@ -76,7 +76,7 @@ function generateBox(player) {
                 } else {
                     shipsActive = shipsPlayer1;
                 }
-                if (event.target.parentNode != box) {
+                if (event.target.parentNode != box && !event.target.classList.contains('cell-cross')) {
                     event.target.classList.add('cell-cross');
                     for (const ship of shipsActive) {
                         for (let i = 0; i < getComputedStyle(ship.ship).width.replace('px', '') / 50; i++) {
@@ -90,10 +90,9 @@ function generateBox(player) {
                                         && ship.quantityHits == getComputedStyle(ship.ship).height.replace('px', '') / 50) 
                                         || (getComputedStyle(ship.ship).height.replace('px', '') / 50 == 1 
                                         && ship.quantityHits == getComputedStyle(ship.ship).width.replace('px', '') / 50)) {
-                                        
-                                        
+                                        sinkShip(ship.ship, event.target.parentNode);
+                                        countRedShip(event.target.parentNode);
                                     }
-                                    
                                     return;
                                 }
                             }
@@ -113,6 +112,57 @@ function generateBox(player) {
                 }
             }
         });
+    }
+}
+
+function countRedShip(field) {
+    let count = 0;
+    for (const cell of field.children) {
+        if (getComputedStyle(cell).backgroundColor == 'rgb(167, 30, 30)') {
+            count++;
+        }
+    }
+    if (count == 20) {
+        endGame();
+    }
+}
+
+function endGame() {
+    document.getElementById('modal-p').textContent = box == player1Cover ? 'Игрок 1 выйграл!' : 'Игрок 2 выйграл!';
+    readyPlayerButton.textContent = 'Сыграть еще';
+    document.getElementsByClassName('modal-conteiner')[0].style.display = 'flex'; // 1
+    readyPlayerButton.addEventListener('click', ()=>{ // 2
+        location.reload();
+    })
+}
+
+
+function sinkShip(sink, field) {
+    let leftShip = sink.offsetLeft;
+    let topShip = sink.offsetTop;
+    let top = sink.offsetTop;
+    let left = sink.offsetLeft;
+    for (let i = 0; i < getComputedStyle(sink).width.replace('px', '') / 50; i++) {
+        leftShip = sink.offsetLeft + 50 * i;
+        for (let j = 0; j < getComputedStyle(sink).height.replace('px', '') / 50; j++) {
+            topShip = sink.offsetTop  + 50 * j;
+            for (const c of field.children) {
+                if (Math.abs(leftShip - c.offsetLeft) == 50 && top == c.offsetTop) {
+                    c.classList.add('cell-cross');
+                }
+                if (Math.abs(topShip - c.offsetTop) == 50 && left == c.offsetLeft) {
+                    c.classList.add('cell-cross');
+                }
+                if (c.offsetLeft == leftShip && c.offsetTop == topShip) {
+                    c.style.background = '#a71e1e';
+                    for (const cell of field.children) {
+                        if (Math.abs(leftShip - cell.offsetLeft) == 50 && Math.abs(topShip - cell.offsetTop) == 50) {
+                            cell.classList.add('cell-cross');
+                        }
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -166,6 +216,7 @@ function addShip(classTag, left) {
             }
         } else {
             blockButtons();
+            checkShipPosition(ship.offsetLeft, ship.offsetTop);
             shipActive = null;
             ship.classList.remove('active-ship');
         }
@@ -285,9 +336,10 @@ function blockButtons() {
                 redship = true;
             }
         }
-        readyButton.disabled = false;
         if (!redship) {
-            //readyButton.disabled = count == 10 ? false : true;
+            readyButton.disabled = count == 10 ? false : true;
+        } else {
+            readyButton.disabled = true;
         }
         turnButton.disabled = !turnButton.disabled; // 3
         deleteButton.disabled = !deleteButton.disabled;
@@ -350,6 +402,7 @@ function init() {
         }
         player1.removeChild(shipActive); // 3
         shipActive = null;
+        checkShipCross();
         blockButtons();
     });
     
